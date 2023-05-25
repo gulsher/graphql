@@ -1,6 +1,6 @@
 const express = require('express');
 const {graphqlHTTP} = require('express-graphql');
-const {GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt , GraphQLNonNull} = require('graphql');
+const {GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLInt , GraphQLNonNull, GraphQLInputObjectType} = require('graphql');
 const app = express();
 const port = 5000;
 
@@ -36,13 +36,24 @@ const AuthorType = new GraphQLObjectType({
     fields:()=>({
         id:{type:GraphQLNonNull(GraphQLInt)},
         name:{type:GraphQLNonNull(GraphQLString)},
-    })
+        books:{type:new GraphQLList(BookType), 
+        resolve:(author)=>{
+            return books.filter(books=> books.id === author.id)}
+        }})
 })
 
 const RootQueryType = new GraphQLObjectType({
     name:'Query',
     description:'Root Query',
     fields:()=>({
+        book:{
+             type:BookType,
+            description:'A single book',
+            args:{
+                id:{type:GraphQLInt}
+            },
+            resolve:(parent,args)=> books.find(book=> book.id == args.id) //in real time application it would be database values
+        },
         books:{
             type:new GraphQLList(BookType),
             description:'list of books',
@@ -52,6 +63,14 @@ const RootQueryType = new GraphQLObjectType({
             type:new GraphQLList(AuthorType),
             description:'list of author',
             resolve:()=> authors //in real time application it would be database values
+        },
+        author:{
+            type:AuthorType,
+            description:'single author',
+            args:{
+                id:{type:GraphQLInt}
+            },
+            resolve:(parent,args)=> authors.find(author=>author.id == args.id) //in real time application it would be database values
         }
     })
 })
