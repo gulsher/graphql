@@ -1,0 +1,20 @@
+mutation{
+  addBook(name:"my book",authorId:1) {
+    id,
+    name
+  }
+}
+
+mutation{
+  addAuthor(name:"dk") {
+    id,
+    name
+  }
+}
+
+{
+  books{
+    id,
+    name
+  }
+}
